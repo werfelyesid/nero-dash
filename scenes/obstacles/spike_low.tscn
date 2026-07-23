@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://spike_low_001"]
+
+[ext_resource type="Script" path="res://scripts/obstacles/obstacle_base.gd" id="1_obstacle"]
+
+[sub_resource type="RectangleShape2D" id="1_rect"]
+size = Vector2(40, 60)
+
+[sub_resource type="ConcavePolygonShape2D" id="2_triangle"]
+; Forma triangular para el pincho (aproximada como rectángulo para colisión)
+; En Godot, para forma exacta usa CollisionPolygon2D
+
+[node name="SpikeLow" type="Area2D"]
+position = Vector2(0, -30)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("1_rect")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, 0)
+scale = Vector2(1, 1)
+; ⚠️ TODO: Asignar textura de triángulo/pincho en el editor
+; Puedes crearla con GIMP/Inkscape o usar el script procedural abajo
+; El sprite es un triángulo rojo apuntando hacia arriba (32x32)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+; Animaciones futuras: entrada desde el suelo, idle, etc.

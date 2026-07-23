@@ -1,0 +1,25 @@
+init# ─── Godot 4.x ───
+.godot/
+*.import
+*.tmp
+*.bak
+
+# ─── Exportaciones / builds ───
+export/
+build/
+*.apk
+*.aab
+*.exe
+
+# ─── Archivos de sistema ───
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ─── Historial de VS Code ───
+.history/
+
+# ─── Datos de usuario / saves ───
+user://
