@@ -2,12 +2,13 @@ extends CharacterBody2D
 class_name Player
 
 ## ═══════════════════════════════════════
-## Player.gd — Fase 1.1: El Cubo que salta
+## Player.gd — Fase 2: El Cubo que salta
 ## ═══════════════════════════════════════
-## Controla al personaje principal:
-## - Auto-scroll horizontal
+## El cubo se queda quieto en X (modo normal).
+## En modo libre (free_move_mode) se mueve a su gusto.
+## El MAPA se mueve hacia la izquierda.
 ## - Salto con tap (fuerza fija)
-## - Gravedad simulada
+## - Gravedad simulada (invertible con portal)
 ## - Colisión = muerte
 ## - Rotación visual al saltar
 
@@ -15,20 +16,27 @@ class_name Player
 signal player_died
 
 # ─── Constantes de movimiento ───
-const SCROLL_SPEED := 400.0        # px/s — velocidad horizontal constante
-const JUMP_VELOCITY := -650.0      # px/s — fuerza del salto (negativo = arriba)
+const JUMP_VELOCITY := -650.0      # px/s — fuerza del salto
 const GRAVITY := 1800.0            # px/s² — gravedad simulada
-const GROUND_Y := 0.0              # Posición Y del suelo (relativa al nivel)
+const FREE_MOVE_SPEED := 300.0     # px/s — velocidad en modo libre
+const SHIP_RISE_SPEED := -420.0    # px/s — subida del avión al mantener pulsado
+const SHIP_MAX_FALL := 650.0       # px/s — velocidad máxima de caída del avión
+const ORB_BOOST := -1050.0         # px/s — impulso del orbe
 
 # ─── Estado del jugador ───
 var is_dead := false
-var is_on_ground := true
+var is_on_ground := false
 var attempts := 0
+var gravity_dir: int = 1           # 1 = normal, -1 = invertida
+var mode: String = "cube"          # "cube" o "ship"
 
 # ─── Referencias a nodos ───
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var death_particles: GPUParticles2D = $DeathParticles
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+
+# Cámara (para seguir al jugador en modo libre)
+var _camera: Camera2D = null
 
 
 func _ready() -> void:
@@ -37,33 +45,57 @@ func _ready() -> void:
 	if not sprite:
 		push_warning("Player: No se encontró Sprite2D. Creando uno por defecto.")
 		_create_default_sprite()
+	
+	# Buscar la cámara en la escena
+	var parent := get_parent()
+	if parent:
+		_camera = parent.get_node_or_null("Camera2D") as Camera2D
 
 
 func _physics_process(delta: float) -> void:
 	if is_dead:
 		return
 	
-	# ─── 1. Auto-scroll horizontal ───
-	velocity.x = SCROLL_SPEED
+	# ─── 1. Movimiento horizontal ───
+	if GameState and GameState.free_move_mode:
+		# Modo libre: moverse con flechas / A,D
+		var input_dir := Input.get_axis("move_left", "move_right")
+		velocity.x = input_dir * FREE_MOVE_SPEED
+	else:
+		# Modo normal: el cubo NO se mueve en X — el mapa lo hace
+		velocity.x = 0.0
 	
-	# ─── 2. Gravedad ───
-	if not is_on_floor():
-		velocity.y += GRAVITY * delta
+	# ─── 2. Gravedad y salto (según el modo) ───
+	if mode == "ship":
+		# Modo avión: mantener = subir, soltar = caer
+		if Input.is_action_pressed("jump"):
+			velocity.y = SHIP_RISE_SPEED
+		else:
+			velocity.y += GRAVITY * delta
+			velocity.y = minf(velocity.y, SHIP_MAX_FALL)
 		is_on_ground = false
 	else:
-		# Aseguramos que esté pegado al suelo
-		velocity.y = 0.0
-		is_on_ground = true
+		# Modo cubo: gravedad invertible y salto con tap
+		var is_grounded := is_on_floor() if gravity_dir == 1 else is_on_ceiling()
+		
+		if not is_grounded:
+			velocity.y += GRAVITY * gravity_dir * delta
+			is_on_ground = false
+		else:
+			velocity.y = 0.0
+			is_on_ground = true
+		
+		if Input.is_action_just_pressed("jump") and is_grounded:
+			_jump()
 	
-	# ─── 3. Salto (tap / click / space) ───
-	if Input.is_action_just_pressed("jump") and is_on_floor():
-		_jump()
-	
-	# ─── 4. Rotación visual al saltar ───
+	# ─── 3. Rotación visual ───
 	_update_rotation(delta)
 	
 	# ─── 5. Aplicar movimiento ───
 	move_and_slide()
+	
+	# ─── 5.5 Cámara sigue al jugador en modo libre ───
+	_update_camera()
 	
 	# ─── 6. Detectar colisiones letales ───
 	_check_lethal_collisions()
@@ -71,18 +103,80 @@ func _physics_process(delta: float) -> void:
 
 ## Realiza el salto del jugador
 func _jump() -> void:
-	velocity.y = JUMP_VELOCITY
+	velocity.y = JUMP_VELOCITY * gravity_dir
 	is_on_ground = false
-	# Pequeño efecto: el cubo "se estira" al saltar
 	if sprite:
 		var tween := create_tween()
 		tween.tween_property(sprite, "scale", Vector2(0.8, 1.3), 0.08)
 		tween.tween_property(sprite, "scale", Vector2(1.0, 1.0), 0.15)
 
 
+## Establece la gravedad (1 = abajo, -1 = arriba)
+func set_gravity(dir: int) -> void:
+	gravity_dir = dir
+	if sprite:
+		sprite.scale.y = gravity_dir * abs(sprite.scale.y)
+	print("🌀 Gravedad: %s" % ("arriba" if gravity_dir == -1 else "abajo"))
+
+
+## Alterna la gravedad (mantenido por compatibilidad)
+func invert_gravity() -> void:
+	set_gravity(gravity_dir * -1)
+
+
+## Cambia entre modo cubo y modo avión
+func set_ship_mode(enabled: bool) -> void:
+	if enabled:
+		mode = "ship"
+		gravity_dir = 1
+		if sprite and PlaceholderAssets:
+			sprite.texture = PlaceholderAssets.create_ship_sprite(56, Color(0.3, 0.9, 1.0))
+			sprite.centered = true
+			sprite.scale = Vector2.ONE
+			sprite.rotation = 0.0
+	else:
+		mode = "cube"
+		if sprite and PlaceholderAssets:
+			sprite.texture = PlaceholderAssets.create_player_sprite(48, Color(0.0, 0.9, 1.0))
+			sprite.centered = true
+			sprite.scale = Vector2.ONE
+			sprite.rotation = 0.0
+	print("✈️ Modo: %s" % ("avión" if enabled else "cubo"))
+
+
+## Impulso del orbe (salto fuerte sin necesidad de tocar el suelo)
+func orb_boost() -> void:
+	velocity.y = ORB_BOOST * gravity_dir
+	is_on_ground = false
+	if sprite:
+		var tween := create_tween()
+		tween.tween_property(sprite, "scale", Vector2(1.3, 0.8), 0.08)
+		tween.tween_property(sprite, "scale", Vector2.ONE, 0.15)
+
+
+## Mueve la cámara para seguir al jugador en modo libre
+func _update_camera() -> void:
+	if not _camera:
+		return
+	
+	if GameState and GameState.free_move_mode:
+		# Modo libre: cámara sigue al jugador suavemente
+		var target_x: float = global_position.x
+		_camera.global_position.x = lerpf(_camera.global_position.x, target_x, 0.1)
+	else:
+		# Modo normal: cámara vuelve suavemente a su posición inicial (360)
+		_camera.global_position.x = lerpf(_camera.global_position.x, 360.0, 0.05)
+
+
 ## Rota el sprite según el movimiento vertical
 func _update_rotation(delta: float) -> void:
 	if not sprite:
+		return
+	
+	if mode == "ship":
+		# El avión se inclina según su velocidad vertical
+		var target_tilt: float = clampf(velocity.y / 900.0, -0.6, 0.6)
+		sprite.rotation = lerpf(sprite.rotation, target_tilt, 10.0 * delta)
 		return
 	
 	if not is_on_ground:
@@ -137,12 +231,17 @@ func die() -> void:
 func reset() -> void:
 	is_dead = false
 	is_on_ground = true
+	gravity_dir = 1
+	mode = "cube"
 	velocity = Vector2.ZERO
 	
 	if sprite:
 		sprite.visible = true
 		sprite.rotation = 0.0
 		sprite.scale = Vector2.ONE
+		if PlaceholderAssets:
+			sprite.texture = PlaceholderAssets.create_player_sprite(48, Color(0.0, 0.9, 1.0))
+			sprite.centered = true
 	
 	if collision_shape:
 		collision_shape.set_deferred("disabled", false)

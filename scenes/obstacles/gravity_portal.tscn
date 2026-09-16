@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bmhqjiiy4q6p2"]
+
+[ext_resource type="Script" uid="uid://dkup5ddt3530u" path="res://scripts/obstacles/gravity_portal.gd" id="1_portal"]
+
+[sub_resource type="CircleShape2D" id="portal_shape"]
+radius = 30.0
+
+[node name="GravityPortalDown" type="Area2D" unique_id=2100175573]
+script = ExtResource("1_portal")
+target_gravity = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=985030042]
+shape = SubResource("portal_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1205132196]

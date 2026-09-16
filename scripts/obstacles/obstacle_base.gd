@@ -2,13 +2,11 @@ extends Area2D
 class_name ObstacleBase
 
 ## ═══════════════════════════════════════
-## ObstacleBase.gd — Fase 1.3
+## ObstacleBase.gd — Fase 2
 ## ═══════════════════════════════════════
 ## Clase base para TODOS los obstáculos.
-## Cada obstáculo hereda de aquí y define:
-## - Su sprite/forma
-## - Su tipo de movimiento (si aplica)
-## - Su comportamiento único
+## - Se mueven hacia la izquierda (el mapa avanza)
+## - Se destruyen al salir de pantalla
 
 # ─── Propiedades base ───
 @export var obstacle_type: String = "generic"
@@ -19,22 +17,49 @@ class_name ObstacleBase
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 
-
 func _ready() -> void:
-	# Todos los obstáculos pertenecen al grupo "obstacle"
 	add_to_group("obstacle")
 	
-	# Generar textura procedural si no hay sprite asignado
 	if sprite and sprite.texture == null and PlaceholderAssets:
-		sprite.texture = PlaceholderAssets.create_spike_low_sprite()
+		_assign_procedural_texture()
 		sprite.centered = true
 	
-	# Conectar señal de colisión (body_entered)
 	body_entered.connect(_on_body_entered)
 	
-	# Iniciar animación si existe
 	if animation_player and animation_player.has_animation("float"):
 		animation_player.play("float")
+
+
+func _physics_process(delta: float) -> void:
+	# ─── Si estamos en modo libre, no moverse ───
+	if GameState and GameState.free_move_mode:
+		return
+	
+	# ─── Moverse hacia la izquierda ───
+	var speed: float = 400.0
+	if GameState:
+		speed = GameState.current_scroll_speed
+	position.x -= speed * delta
+
+
+## Asigna una textura procedural según el nombre del nodo raíz
+func _assign_procedural_texture() -> void:
+	var parent_name := get_parent() if get_parent() else self
+	var scene_name := owner.name if owner else name
+	
+	match name.to_lower():
+		"spikedouble":
+			sprite.texture = PlaceholderAssets.create_spike_double_sprite()
+		"spikeceiling":
+			sprite.texture = PlaceholderAssets.create_spike_ceiling_sprite()
+		"blockfloating":
+			sprite.texture = PlaceholderAssets.create_block_floating_sprite()
+		"spikelow":
+			sprite.texture = PlaceholderAssets.create_spike_low_sprite()
+		"spikehigh":
+			sprite.texture = PlaceholderAssets.create_spike_high_sprite()
+		_:
+			sprite.texture = PlaceholderAssets.create_spike_low_sprite()
 
 
 ## Cuando un cuerpo entra en el área de colisión

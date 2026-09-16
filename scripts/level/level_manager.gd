@@ -2,146 +2,148 @@ extends Node2D
 class_name LevelManager
 
 ## ═══════════════════════════════════════
-## LevelManager.gd — Fase 1.3-1.5
+## LevelManager.gd — ¡Modo Editor Visual!
 ## ═══════════════════════════════════════
-## Gestiona:
-## - Spawning de obstáculos con timing
-## - Dificultad progresiva
-## - Muerte y reinicio
-## - Contador de intentos
+## Pon los obstáculos en el nodo "LevelObstacles"
+## y muévelos en el editor como quieras.
 
-# ─── Señales ───
 signal level_started
-signal level_restarted
+signal level_completed
 
-# ─── Referencias ───
 @onready var player: Player = $"../Player"
-@onready var spawn_marker: Marker2D = $"../SpawnPoint"
-@onready var camera: Camera2D = $"../Player/Camera2D"
 @onready var retry_ui: Control = $"../UI/RetryUI"
+@onready var win_ui: Control = $"../UI/WinUI"
+@onready var hud: HUD = $"../UI/HUD"
+@onready var music_player: AudioStreamPlayer = $"../MusicPlayer"
+@onready var level_obstacles: Node2D = $"../LevelObstacles"
 
-# ─── Configuración de spawning ───
-const SPAWN_INTERVAL_MIN := 1.2         # segundos entre obstáculos (fácil)
-const SPAWN_INTERVAL_MAX := 0.5         # segundos entre obstáculos (difícil)
-const SPAWN_DISTANCE := 900.0           # px adelante del jugador donde spawnean
-const DIFFICULTY_RAMP_TIME := 30.0      # segundos hasta llegar a dificultad máxima
-
-# ─── Obstáculos disponibles ───
-var obstacle_scenes: Array[PackedScene] = []
-
-# ─── Estado ───
-var spawn_timer: float = 0.0
+var current_level: Dictionary = {}
+var current_scroll_speed: float = 400.0
+var level_duration: float = 30.0    # duración en segundos
+var total_attempts: int = 0
 var elapsed_time: float = 0.0
 var is_running: bool = false
-var total_attempts: int = 0
 
 
 func _ready() -> void:
-	# Cargar escenas de obstáculos
-	_load_obstacles()
-	
-	# Conectar señal de muerte del jugador
 	if player:
 		player.player_died.connect(_on_player_died)
+	_connect_obstacles()
 	
-	# Ocultar UI de reinicio al inicio
-	if retry_ui:
-		retry_ui.visible = false
-	
-	# Iniciar el nivel
-	start_level()
+	var level_id: String = "level_01"
+	if GameState:
+		level_id = GameState.selected_level
+	start_level(level_id)
 
 
-## Carga las escenas de obstáculos disponibles
-func _load_obstacles() -> void:
-	var spike_low := load("res://scenes/obstacles/spike_low.tscn")
-	var spike_high := load("res://scenes/obstacles/spike_high.tscn")
-	
-	if spike_low:
-		obstacle_scenes.append(spike_low)
-	if spike_high:
-		obstacle_scenes.append(spike_high)
-	
-	if obstacle_scenes.is_empty():
-		push_warning("LevelManager: No se encontraron escenas de obstáculos.")
+func _connect_obstacles() -> void:
+	if not level_obstacles:
+		return
+	# Conectar TODOS los Area2D (spikes, killzones) que estén en LevelObstacles
+	for child in level_obstacles.get_children():
+		_connect_recursive(child)
 
 
-func _process(delta: float) -> void:
+func _connect_recursive(node: Node) -> void:
+	# Ignorar nodos KillZone (ya no se usan)
+	if "KillZone" in node.name:
+		return
+	
+	if node is Area2D:
+		node.add_to_group("obstacle")
+		if not node.body_entered.is_connected(_on_obstacle_hit):
+			node.body_entered.connect(_on_obstacle_hit.bind(node))
+	for child in node.get_children():
+		_connect_recursive(child)
+
+
+func _on_obstacle_hit(body: Node2D, _obs: Node) -> void:
+	if body is Player:
+		body.die()
+
+
+func load_level(level_id: String) -> void:
+	current_level = LevelDatabase.get_level(level_id)
+	current_scroll_speed = current_level.get("scroll_speed", 400.0)
+	GameState.current_scroll_speed = current_scroll_speed
+	
+	# Los obstáculos ya están en la escena del nivel (no se cargan dinámicamente)
+	
+	# Duración del nivel
+	var bpm: float = current_level.get("bpm", 120.0)
+	var obs: Array = current_level.get("obstacles", [])
+	if not obs.is_empty():
+		var last: Dictionary = obs[-1]
+		level_duration = last.get("beat", 40.0) * (60.0 / bpm) + 2.0
+	else:
+		level_duration = 999.0  # Sin límite de tiempo — el nivel termina cuando acaba la música
+	
+	if music_player:
+		music_player.stop()
+		var path: String = current_level.get("music", "")
+		if not path.is_empty():
+			var m: AudioStream = load(path)
+			if m:
+				music_player.stream = m
+				music_player.play()
+
+
+func start_level(level_id: String = "level_01") -> void:
+	load_level(level_id)
+	elapsed_time = 0.0
+	total_attempts = 0
+	is_running = true
+	
+	# Resetear modo libre al iniciar/reiniciar
+	if GameState:
+		GameState.free_move_mode = false
+	
+	if player:
+		player.reset()
+		player.global_position = Vector2(30, 600)
+	if retry_ui: retry_ui.visible = false
+	if win_ui: win_ui.visible = false
+	if hud:
+		hud.update_time(0.0)
+		hud.update_attempts(0)
+	level_started.emit()
+
+
+func _physics_process(delta: float) -> void:
 	if not is_running:
 		return
-	
 	elapsed_time += delta
 	
-	# ─── Spawning de obstáculos ───
-	spawn_timer -= delta
-	if spawn_timer <= 0.0:
-		_spawn_obstacle()
-		spawn_timer = _get_spawn_interval()
-
-
-## Calcula el intervalo de spawn según la dificultad actual
-func _get_spawn_interval() -> float:
-	var difficulty := clampf(elapsed_time / DIFFICULTY_RAMP_TIME, 0.0, 1.0)
-	return lerpf(SPAWN_INTERVAL_MIN, SPAWN_INTERVAL_MAX, difficulty)
-
-
-## Genera un obstáculo aleatorio adelante del jugador
-func _spawn_obstacle() -> void:
-	if obstacle_scenes.is_empty():
-		return
+	if hud:
+		hud.update_time(elapsed_time)
 	
-	# Elegir obstáculo aleatorio
-	var scene: PackedScene = obstacle_scenes.pick_random()
-	var obstacle: Node = scene.instantiate()
-	
-	# Posicionar adelante del jugador
-	var spawn_x := player.global_position.x + SPAWN_DISTANCE
-	obstacle.global_position = Vector2(spawn_x, 0.0)
-	
-	# Añadir a la escena (al mismo padre que el LevelManager)
-	get_parent().add_child(obstacle)
-	
-	print("🚧 Obstáculo spawneado en x=%.0f | tiempo=%.1fs" % [spawn_x, elapsed_time])
+	# ¿Se acabó el tiempo del nivel?
+	if elapsed_time >= level_duration:
+		_complete_level()
 
 
-## Inicia el nivel
-func start_level() -> void:
-	is_running = true
-	elapsed_time = 0.0
-	spawn_timer = 2.0  # Primer obstáculo tras 2 segundos
-	level_started.emit()
-	print("🎮 ¡Nivel iniciado!")
+func _complete_level() -> void:
+	if not is_running: return
+	is_running = false
+	if music_player: music_player.stop()
+	if win_ui:
+		win_ui.visible = true
+		win_ui.show_win(elapsed_time, total_attempts)
+	level_completed.emit()
 
 
-## Cuando el jugador muere
 func _on_player_died() -> void:
 	is_running = false
 	total_attempts += 1
-	
-	# Mostrar UI de reinicio tras breve pausa
+	if hud: hud.update_attempts(total_attempts)
 	await get_tree().create_timer(0.5).timeout
 	if retry_ui:
 		retry_ui.visible = true
 		retry_ui.show_retry(total_attempts)
 
 
-## Reinicia el nivel
 func restart_level() -> void:
-	# Reiniciar jugador
 	if player:
 		player.reset()
-		player.global_position = Vector2(120.0, 0.0)
-	
-	# Eliminar todos los obstáculos existentes
-	for child in get_parent().get_children():
-		if child.is_in_group("obstacle"):
-			child.queue_free()
-	
-	# Ocultar UI
-	if retry_ui:
-		retry_ui.visible = false
-	
-	# Reiniciar nivel
-	start_level()
-	level_restarted.emit()
-	print("🔄 Nivel reiniciado. Intento #%d" % total_attempts)
+		player.global_position = Vector2(30, 600)
+	start_level(current_level.get("id", "level_01"))

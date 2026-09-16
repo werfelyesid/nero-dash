@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://level_01_scene"]
+
+; ═══════════════════════════════════════
+; NIVEL 01: Primeros Pasos (FÁCIL)
+; ═══════════════════════════════════════
+; 🖱️ Arrastra los obstáculos en el editor para cambiarlos de lugar
+; 📏 X = distancia en píxeles desde el inicio
+
+[node name="Level01" type="Node2D"]
+
+[node name="SpikeLow_01" type="Area2D" parent="."]
+position = Vector2(700, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeLow_01"]
+position = Vector2(0, 0)
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeLow_01"]
+position = Vector2(0, -30)
+
+[node name="SpikeLow_02" type="Area2D" parent="."]
+position = Vector2(1400, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeLow_02"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeLow_02"]
+position = Vector2(0, -30)
+
+[node name="SpikeHigh_01" type="Area2D" parent="."]
+position = Vector2(2100, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeHigh_01"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeHigh_01"]
+position = Vector2(0, -45)
+scale = Vector2(1.2, 1.2)
+
+[node name="SpikeLow_03" type="Area2D" parent="."]
+position = Vector2(2800, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeLow_03"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeLow_03"]
+position = Vector2(0, -30)
+
+[node name="SpikeLow_04" type="Area2D" parent="."]
+position = Vector2(3500, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeLow_04"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeLow_04"]
+position = Vector2(0, -30)
+
+[node name="SpikeHigh_02" type="Area2D" parent="."]
+position = Vector2(4200, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeHigh_02"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeHigh_02"]
+position = Vector2(0, -45)
+scale = Vector2(1.2, 1.2)
+
+[node name="SpikeLow_05" type="Area2D" parent="."]
+position = Vector2(4900, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeLow_05"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeLow_05"]
+position = Vector2(0, -30)
+
+[node name="SpikeLow_06" type="Area2D" parent="."]
+position = Vector2(5600, 640)
+script = ExtResource("1_obstacle")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SpikeLow_06"]
+shape = SubResource("spike_shape")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpikeLow_06"]
+position = Vector2(0, -30)

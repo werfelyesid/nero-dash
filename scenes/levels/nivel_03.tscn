@@ -1,0 +1,419 @@
+[gd_scene format=3 uid="uid://cgjrcn1ryqpqd"]
+
+[ext_resource type="Script" uid="uid://dx5dlqs7qtjea" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://cpoapwm8e3l6a" path="res://scripts/level/level_manager.gd" id="2_level_mgr"]
+[ext_resource type="Script" uid="uid://cdhwesbo4e1cs" path="res://scripts/ui/retry_ui.gd" id="3_retry"]
+[ext_resource type="Script" uid="uid://ca01qeboytu1h" path="res://scripts/ui/hud.gd" id="4_hud"]
+[ext_resource type="Script" uid="uid://bdy356xe7h1df" path="res://scripts/ui/win_ui.gd" id="5_win"]
+[ext_resource type="PackedScene" path="res://scenes/levels/level_03_objects.tscn" id="6_ij6g7"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/stacked_blocks.tscn" id="7_26r86"]
+[ext_resource type="PackedScene" uid="uid://bsd5g62hjpnku" path="res://scenes/obstacles/platform_block.tscn" id="8_w61jn"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/spike_low.tscn" id="9_1diva"]
+[ext_resource type="PackedScene" uid="uid://bmhqjiiy4q6p2" path="res://scenes/obstacles/gravity_portal.tscn" id="10_r70ex"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/air_platform.tscn" id="11_a18kg"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/spike_ceiling.tscn" id="12_26r86"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/color_zone.tscn" id="13_zone"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/spike_double.tscn" id="14_r70ex"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/ship_portal.tscn" id="15_r70ex"]
+
+[sub_resource type="RectangleShape2D" id="ground_shape"]
+size = Vector2(11943.75, 97)
+
+[sub_resource type="ParticleProcessMaterial" id="death_pmat"]
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, 0, 1)
+spread = 180.0
+initial_velocity_min = 200.0
+initial_velocity_max = 500.0
+gravity = Vector3(0, 300, 0)
+scale_min = 0.5
+scale_max = 1.5
+color = Color(1, 0.15, 0.15, 1)
+
+[sub_resource type="RectangleShape2D" id="player_collision"]
+size = Vector2(44, 43)
+
+[node name="Nivel03" type="Node2D" unique_id=77819282]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=718039214]
+position = Vector2(360, 640)
+
+[node name="Background" type="ColorRect" parent="." unique_id=1422145097]
+show_behind_parent = true
+custom_minimum_size = Vector2(20000, 2000)
+offset_left = -2507.0
+offset_top = -78.0
+offset_right = 17493.0
+offset_bottom = 1922.0
+color = Color(0.12, 0.03, 0.03, 1)
+
+[node name="GroundVisual" type="ColorRect" parent="." unique_id=601536980]
+custom_minimum_size = Vector2(20000, 80)
+offset_left = -2028.0
+offset_top = 647.0
+offset_right = 17991.0
+offset_bottom = 746.0
+color = Color(0.2, 0.7, 0.3, 1)
+
+[node name="GroundVisual2" type="ColorRect" parent="." unique_id=1263602566]
+custom_minimum_size = Vector2(20000, 80)
+offset_left = -1995.0
+offset_top = 619.0
+offset_right = 18037.0
+offset_bottom = 2055.0
+color = Color(0.8901961, 0.69803923, 0.3019608, 1)
+
+[node name="Ground" type="StaticBody2D" parent="." unique_id=1457353194]
+position = Vector2(0, 680)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=1998561437]
+position = Vector2(3939, -15)
+shape = SubResource("ground_shape")
+
+[node name="Ceiling" type="StaticBody2D" parent="." unique_id=1453216070]
+position = Vector2(0, -200)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ceiling" unique_id=1148366277]
+position = Vector2(92.25, -21.5)
+shape = SubResource("ground_shape")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1178751616]
+position = Vector2(324.09088, 490.63638)
+script = ExtResource("1_player")
+
+[node name="DeathParticles" type="GPUParticles2D" parent="Player" unique_id=1637230853]
+position = Vector2(-3.9999695, 3)
+scale = Vector2(3, 3)
+emitting = false
+amount = 1000
+lifetime = 10.93
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("death_pmat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=24401931]
+position = Vector2(3.0000305, 3)
+shape = SubResource("player_collision")
+
+[node name="LevelManager" type="Node2D" parent="." unique_id=1487606161]
+script = ExtResource("2_level_mgr")
+
+[node name="LevelObstacles" type="Node2D" parent="." unique_id=2004867448]
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=1887587477]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=363016590]
+
+[node name="HUD" type="Control" parent="UI" unique_id=1598199255]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("4_hud")
+
+[node name="TimeLabel" type="Label" parent="UI/HUD" unique_id=1378620033]
+layout_mode = 0
+offset_left = 225.0
+offset_top = -2.0
+offset_right = 505.0
+offset_bottom = 38.0
+text = "00:00"
+
+[node name="AttemptsLabel" type="Label" parent="UI/HUD" unique_id=1425640637]
+layout_mode = 0
+offset_left = 236.0
+offset_top = 34.0
+offset_right = 516.0
+offset_bottom = 74.0
+text = "Intentos: 0"
+
+[node name="RetryUI" type="Control" parent="UI" unique_id=1079394801]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_retry")
+
+[node name="Panel" type="Panel" parent="UI/RetryUI" unique_id=1029194084]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 160.0
+offset_top = 500.0
+offset_right = 560.0
+offset_bottom = 700.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AttemptsLabel" type="Label" parent="UI/RetryUI/Panel" unique_id=382188353]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Intento #0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RetryButton" type="Button" parent="UI/RetryUI/Panel" unique_id=516180579]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = 90.0
+offset_right = 300.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "REINTENTAR"
+
+[node name="WinUI" type="Control" parent="UI" unique_id=1210776159]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_win")
+
+[node name="Panel" type="Panel" parent="UI/WinUI" unique_id=317819843]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 120.0
+offset_top = 350.0
+offset_right = 600.0
+offset_bottom = 650.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="UI/WinUI/Panel" unique_id=1603160492]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 20.0
+offset_right = 440.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
+theme_override_font_sizes/font_size = 28
+text = "NIVEL COMPLETADO!"
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="UI/WinUI/Panel" unique_id=90240613]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 90.0
+offset_right = 440.0
+offset_bottom = 130.0
+theme_override_font_sizes/font_size = 22
+text = "Tiempo: 00:00"
+horizontal_alignment = 1
+
+[node name="AttemptsLabel" type="Label" parent="UI/WinUI/Panel" unique_id=1491786653]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 140.0
+offset_right = 440.0
+offset_bottom = 180.0
+theme_override_font_sizes/font_size = 22
+text = "Intentos: 0"
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="UI/WinUI/Panel" unique_id=237906395]
+layout_mode = 1
+offset_left = 80.0
+offset_top = 210.0
+offset_right = 220.0
+offset_bottom = 270.0
+text = "Siguiente"
+
+[node name="MenuButton" type="Button" parent="UI/WinUI/Panel" unique_id=1276355240]
+layout_mode = 1
+offset_left = 250.0
+offset_top = 210.0
+offset_right = 390.0
+offset_bottom = 270.0
+text = "Menu"
+
+[node name="Level03Objects" parent="." unique_id=1744155400 instance=ExtResource("6_ij6g7")]
+position = Vector2(686, 534)
+
+[node name="StackedBlocks" parent="Level03Objects" unique_id=885510594 instance=ExtResource("7_26r86")]
+position = Vector2(1011, 35)
+
+[node name="PlatformBlock" parent="Level03Objects" unique_id=1670658197 instance=ExtResource("8_w61jn")]
+position = Vector2(960, 61)
+
+[node name="SpikeLow5" parent="Level03Objects" unique_id=179502052 instance=ExtResource("9_1diva")]
+position = Vector2(1176, 81)
+
+[node name="SpikeLow2" parent="Level03Objects" unique_id=1352118917 instance=ExtResource("9_1diva")]
+position = Vector2(1055, 69)
+
+[node name="PlatformBlock2" parent="Level03Objects" unique_id=236107971 instance=ExtResource("8_w61jn")]
+position = Vector2(22, 63)
+
+[node name="GravityPortal" parent="Level03Objects" unique_id=328593323 instance=ExtResource("10_r70ex")]
+position = Vector2(123, -11)
+
+[node name="SpikeLow3" parent="Level03Objects" unique_id=637669956 instance=ExtResource("9_1diva")]
+position = Vector2(105, 62)
+
+[node name="AirPlatform" parent="Level03Objects" unique_id=1932156821 instance=ExtResource("11_a18kg")]
+position = Vector2(137, -258)
+
+[node name="AirPlatform2" parent="Level03Objects" unique_id=137397586 instance=ExtResource("11_a18kg")]
+position = Vector2(259, -259)
+
+[node name="AirPlatform3" parent="Level03Objects" unique_id=832125729 instance=ExtResource("11_a18kg")]
+position = Vector2(378, -259)
+
+[node name="AirPlatform4" parent="Level03Objects" unique_id=1188078282 instance=ExtResource("11_a18kg")]
+position = Vector2(504, -259)
+
+[node name="AirPlatform5" parent="Level03Objects" unique_id=1707101997 instance=ExtResource("11_a18kg")]
+position = Vector2(527, -27)
+
+[node name="GravityPortal3" parent="Level03Objects" unique_id=2012878912 instance=ExtResource("10_r70ex")]
+position = Vector2(625, -222)
+
+[node name="StackedBlocks2" parent="Level03Objects" unique_id=1631546297 instance=ExtResource("7_26r86")]
+position = Vector2(1121, 36)
+
+[node name="StackedBlocks3" parent="Level03Objects" unique_id=795677998 instance=ExtResource("7_26r86")]
+position = Vector2(1116, -234)
+constant_linear_velocity = Vector2(0, 100)
+
+[node name="TextEdit" type="TextEdit" parent="Level03Objects/StackedBlocks3" unique_id=2059169951]
+offset_left = -355.0
+offset_top = -105.0
+offset_right = -53.0
+offset_bottom = -73.0
+text = "lo haces exelente!!!!⚠️ ⚠️ ⚠️ ⚠️ ⚠️ ⚠️ "
+use_custom_word_separators = true
+highlight_all_occurrences = true
+highlight_current_line = true
+metadata/_edit_use_anchors_ = true
+
+[node name="TextEdit" type="TextEdit" parent="Level03Objects/StackedBlocks3/TextEdit" unique_id=1385678000]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 7.125828
+anchor_top = 6.625
+anchor_right = 7.125828
+anchor_bottom = 6.625
+offset_left = -355.0
+offset_top = -105.0
+offset_right = -53.0
+offset_bottom = -73.0
+text = "VALERYTAAAAA!!!!⚠️ ⚠️ ⚠️⚠️⚠️ ⚠️ "
+use_custom_word_separators = true
+highlight_all_occurrences = true
+highlight_current_line = true
+metadata/_edit_use_anchors_ = true
+
+[node name="SpikeLow4" parent="Level03Objects" unique_id=1645493377 instance=ExtResource("9_1diva")]
+position = Vector2(1390, 54)
+
+[node name="StackedBlocks4" parent="Level03Objects" unique_id=1542671104 instance=ExtResource("7_26r86")]
+position = Vector2(1234, 35)
+
+[node name="StackedBlocks6" parent="Level03Objects" unique_id=690973577 instance=ExtResource("7_26r86")]
+position = Vector2(1228, -229)
+
+[node name="StackedBlocks7" parent="Level03Objects" unique_id=1936268458 instance=ExtResource("7_26r86")]
+position = Vector2(1340, 35)
+
+[node name="StackedBlocks9" parent="Level03Objects" unique_id=299394912 instance=ExtResource("7_26r86")]
+position = Vector2(1333, -174)
+
+[node name="SpikeLow6" parent="Level03Objects" unique_id=1652801814 instance=ExtResource("9_1diva")]
+position = Vector2(1282, 78)
+
+[node name="StackedBlocks10" parent="Level03Objects" unique_id=932803437 instance=ExtResource("7_26r86")]
+position = Vector2(528, 34)
+
+[node name="SpikeLow11" parent="Level03Objects" unique_id=677280569 instance=ExtResource("9_1diva")]
+position = Vector2(1115, -215)
+
+[node name="SpikeLow12" parent="Level03Objects" unique_id=33145364 instance=ExtResource("9_1diva")]
+position = Vector2(1227, -209)
+
+[node name="AirPlatform6" parent="Level03Objects" unique_id=191294761 instance=ExtResource("11_a18kg")]
+position = Vector2(626, -260)
+
+[node name="GravityPortal" parent="." unique_id=2100175573 instance=ExtResource("10_r70ex")]
+position = Vector2(2270, 555)
+
+[node name="AirPlatform" parent="." unique_id=1054347534 instance=ExtResource("11_a18kg")]
+position = Vector2(2392, -3)
+scale = Vector2(20, 1)
+
+[node name="SpikeLow2" parent="." unique_id=297142837 instance=ExtResource("9_1diva")]
+position = Vector2(2123, 39)
+
+[node name="GravityPortal2" parent="." unique_id=178254260 instance=ExtResource("10_r70ex")]
+position = Vector2(2373, 57)
+
+[node name="SpikeCeiling2" parent="." unique_id=2070481000 instance=ExtResource("12_26r86")]
+position = Vector2(5671, -2428)
+scale = Vector2(1000, 50)
+
+[node name="ColorZone" parent="." unique_id=444100003 instance=ExtResource("13_zone")]
+position = Vector2(1881, 417)
+
+[node name="SpikeCeiling" parent="." unique_id=1219114016 instance=ExtResource("12_26r86")]
+position = Vector2(2722, 375)
+
+[node name="PlatformBlock" parent="." unique_id=1165497417 instance=ExtResource("8_w61jn")]
+position = Vector2(2721, 590)
+
+[node name="StackedBlocks" parent="." unique_id=90448912 instance=ExtResource("7_26r86")]
+position = Vector2(2845, 568)
+
+[node name="StackedBlocks2" parent="." unique_id=1748103298 instance=ExtResource("7_26r86")]
+position = Vector2(2978, 570)
+
+[node name="PlatformBlock2" parent="." unique_id=1938485102 instance=ExtResource("8_w61jn")]
+position = Vector2(2978, 498)
+
+[node name="PlatformBlock3" parent="." unique_id=1115282625 instance=ExtResource("8_w61jn")]
+position = Vector2(3096, 588)
+
+[node name="SpikeDouble" parent="." unique_id=765590862 instance=ExtResource("14_r70ex")]
+position = Vector2(3159, 586)
+
+[node name="SpikeCeiling3" parent="." unique_id=387767138 instance=ExtResource("12_26r86")]
+position = Vector2(3212, 573)
+
+[node name="GravityPortal3" parent="." unique_id=576565123 instance=ExtResource("10_r70ex")]
+position = Vector2(3154, 501)
+
+[node name="AirPlatform2" parent="." unique_id=1584371485 instance=ExtResource("11_a18kg")]
+position = Vector2(3303, 30)
+
+[node name="AirPlatform3" parent="." unique_id=1993524317 instance=ExtResource("11_a18kg")]
+position = Vector2(2968, 397)
+
+[node name="AirPlatform4" parent="." unique_id=1059082152 instance=ExtResource("11_a18kg")]
+position = Vector2(2846, 394)
+
+[node name="GravityPortal4" parent="." unique_id=2058424589 instance=ExtResource("10_r70ex")]
+position = Vector2(3586, 55)
+
+[node name="ShipPortal" parent="." unique_id=1814420794 instance=ExtResource("15_r70ex")]
+position = Vector2(3563, 508)

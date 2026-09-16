@@ -1,0 +1,491 @@
+[gd_scene format=3 uid="uid://blit8l2xnjxy8"]
+
+[ext_resource type="PackedScene" path="res://scenes/obstacles/spike_low.tscn" id="1_bo32x"]
+[ext_resource type="Script" uid="uid://dx5dlqs7qtjea" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/spike_ceiling.tscn" id="2_kc6vv"]
+[ext_resource type="Script" uid="uid://cpoapwm8e3l6a" path="res://scripts/level/level_manager.gd" id="2_level_mgr"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/block_floating.tscn" id="3_4t8up"]
+[ext_resource type="Script" uid="uid://cdhwesbo4e1cs" path="res://scripts/ui/retry_ui.gd" id="3_retry"]
+[ext_resource type="Script" uid="uid://ca01qeboytu1h" path="res://scripts/ui/hud.gd" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/stacked_blocks.tscn" id="4_shr66"]
+[ext_resource type="PackedScene" uid="uid://bmhqjiiy4q6p2" path="res://scenes/obstacles/gravity_portal.tscn" id="5_3h30w"]
+[ext_resource type="Script" uid="uid://bdy356xe7h1df" path="res://scripts/ui/win_ui.gd" id="5_win"]
+[ext_resource type="PackedScene" uid="uid://bsd5g62hjpnku" path="res://scenes/obstacles/platform_block.tscn" id="6_qbgax"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/air_platform.tscn" id="7_dobx7"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/spike_double.tscn" id="14_4t8up"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/free_move_zone.tscn" id="14_shr66"]
+[ext_resource type="Texture2D" uid="uid://b40rc7i2abc5w" path="res://icon.png" id="15_3h30w"]
+[ext_resource type="PackedScene" path="res://scenes/obstacles/color_zone.tscn" id="16_zone"]
+
+[sub_resource type="RectangleShape2D" id="ground_shape"]
+size = Vector2(11943.75, 97)
+
+[sub_resource type="ParticleProcessMaterial" id="death_pmat"]
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, 0, 1)
+spread = 180.0
+initial_velocity_min = 200.0
+initial_velocity_max = 500.0
+gravity = Vector3(0, 300, 0)
+scale_min = 0.5
+scale_max = 1.5
+color = Color(0, 0.9, 1, 1)
+
+[sub_resource type="RectangleShape2D" id="player_collision"]
+size = Vector2(44, 43)
+
+[node name="Nivel01" type="Node2D" unique_id=1173805398]
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=245021063]
+position = Vector2(360, 640)
+
+[node name="Background" type="ColorRect" parent="." unique_id=1844791047]
+show_behind_parent = true
+custom_minimum_size = Vector2(20000, 2000)
+offset_left = -2110.0
+offset_top = -92.0
+offset_right = 17890.0
+offset_bottom = 1908.0
+color = Color(0.05, 0.05, 0.15, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="GroundVisual" type="ColorRect" parent="." unique_id=340952762]
+custom_minimum_size = Vector2(20000, 80)
+offset_left = -2028.0
+offset_top = 647.0
+offset_right = 17991.0
+offset_bottom = 746.0
+color = Color(0.2, 0.7, 0.3, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="GroundVisual2" type="ColorRect" parent="." unique_id=1910718275]
+custom_minimum_size = Vector2(20000, 80)
+offset_left = -1995.0
+offset_top = 619.0
+offset_right = 18037.0
+offset_bottom = 2055.0
+color = Color(0.8901961, 0.69803923, 0.3019608, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="Ground" type="StaticBody2D" parent="." unique_id=377271525]
+position = Vector2(0, 680)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground" unique_id=554941124]
+position = Vector2(3943, -14)
+shape = SubResource("ground_shape")
+
+[node name="SpikeLow" parent="Ground" unique_id=207001061 instance=ExtResource("1_bo32x")]
+position = Vector2(844, -91)
+
+[node name="SpikeCeiling" parent="Ground" unique_id=1445208344 instance=ExtResource("2_kc6vv")]
+position = Vector2(1561, -254)
+
+[node name="BlockFloating" parent="Ground" unique_id=41695937 instance=ExtResource("3_4t8up")]
+position = Vector2(1558, -323)
+
+[node name="StackedBlocks" parent="Ground" unique_id=56051981 instance=ExtResource("4_shr66")]
+position = Vector2(1786, -109)
+
+[node name="GravityPortal" parent="Ground" unique_id=139189565 instance=ExtResource("5_3h30w")]
+position = Vector2(1720, -82)
+
+[node name="PlatformBlock" parent="Ground" unique_id=1670658197 instance=ExtResource("6_qbgax")]
+position = Vector2(1730, -321)
+
+[node name="BlockFloating2" parent="Ground" unique_id=372088362 instance=ExtResource("3_4t8up")]
+position = Vector2(1783, -322)
+
+[node name="PlatformBlock2" parent="Ground" unique_id=1973479106 instance=ExtResource("6_qbgax")]
+position = Vector2(1832, -323)
+
+[node name="AirPlatform" parent="Ground" unique_id=475267666 instance=ExtResource("7_dobx7")]
+position = Vector2(1931, -315)
+
+[node name="AirPlatform2" parent="Ground" unique_id=1397818902 instance=ExtResource("7_dobx7")]
+position = Vector2(2102, -245)
+
+[node name="GravityPortal2" parent="Ground" unique_id=1404546799 instance=ExtResource("5_3h30w")]
+position = Vector2(2133, -195)
+
+[node name="Ceiling" type="StaticBody2D" parent="." unique_id=285951011]
+position = Vector2(0, -200)
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=734785539]
+position = Vector2(201.11606, 603.0712)
+script = ExtResource("1_player")
+
+[node name="DeathParticles" type="GPUParticles2D" parent="Player" unique_id=869096824]
+emitting = false
+amount = 10000
+lifetime = 600.0
+one_shot = true
+speed_scale = 20.91
+explosiveness = 1.0
+randomness = 1.0
+process_material = SubResource("death_pmat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=617978090]
+position = Vector2(0.5, 0)
+shape = SubResource("player_collision")
+
+[node name="LevelManager" type="Node2D" parent="." unique_id=1350459286]
+script = ExtResource("2_level_mgr")
+
+[node name="LevelObstacles" type="Node2D" parent="." unique_id=1308179327]
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=848776011]
+
+[node name="UI" type="CanvasLayer" parent="." unique_id=902719391]
+
+[node name="HUD" type="Control" parent="UI" unique_id=1250682259]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("4_hud")
+metadata/_edit_use_anchors_ = true
+
+[node name="TimeLabel" type="Label" parent="UI/HUD" unique_id=1291782718]
+layout_mode = 0
+offset_left = 225.0
+offset_top = -2.0
+offset_right = 505.0
+offset_bottom = 38.0
+text = "00:00"
+metadata/_edit_use_anchors_ = true
+
+[node name="AttemptsLabel" type="Label" parent="UI/HUD" unique_id=1148342609]
+layout_mode = 0
+offset_left = 236.0
+offset_top = 34.0
+offset_right = 516.0
+offset_bottom = 74.0
+text = "Intentos: 0"
+metadata/_edit_use_anchors_ = true
+
+[node name="RetryUI" type="Control" parent="UI" unique_id=1681581959]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("3_retry")
+
+[node name="Panel" type="Panel" parent="UI/RetryUI" unique_id=1649983528]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 160.0
+offset_top = 500.0
+offset_right = 560.0
+offset_bottom = 700.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="AttemptsLabel" type="Label" parent="UI/RetryUI/Panel" unique_id=1405869702]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 380.0
+offset_bottom = 70.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Intento #0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="RetryButton" type="Button" parent="UI/RetryUI/Panel" unique_id=868501747]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = 90.0
+offset_right = 300.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "REINTENTAR"
+
+[node name="WinUI" type="Control" parent="UI" unique_id=928297236]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("5_win")
+
+[node name="Panel" type="Panel" parent="UI/WinUI" unique_id=828869971]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 120.0
+offset_top = 350.0
+offset_right = 600.0
+offset_bottom = 650.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TitleLabel" type="Label" parent="UI/WinUI/Panel" unique_id=1836669263]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 20.0
+offset_right = 440.0
+offset_bottom = 70.0
+theme_override_colors/font_color = Color(0, 0.9, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "NIVEL COMPLETADO!"
+horizontal_alignment = 1
+
+[node name="TimeLabel" type="Label" parent="UI/WinUI/Panel" unique_id=1575248958]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 90.0
+offset_right = 440.0
+offset_bottom = 130.0
+theme_override_font_sizes/font_size = 22
+text = "Tiempo: 00:00"
+horizontal_alignment = 1
+
+[node name="AttemptsLabel" type="Label" parent="UI/WinUI/Panel" unique_id=96083724]
+layout_mode = 0
+offset_left = 40.0
+offset_top = 140.0
+offset_right = 440.0
+offset_bottom = 180.0
+theme_override_font_sizes/font_size = 22
+text = "Intentos: 0"
+horizontal_alignment = 1
+
+[node name="NextButton" type="Button" parent="UI/WinUI/Panel" unique_id=980497743]
+layout_mode = 1
+offset_left = 80.0
+offset_top = 210.0
+offset_right = 220.0
+offset_bottom = 270.0
+text = "Siguiente"
+
+[node name="MenuButton" type="Button" parent="UI/WinUI/Panel" unique_id=188889560]
+layout_mode = 1
+offset_left = 250.0
+offset_top = 210.0
+offset_right = 390.0
+offset_bottom = 270.0
+text = "Menu"
+
+[node name="SpikeLow" parent="." unique_id=1704790659 instance=ExtResource("1_bo32x")]
+position = Vector2(2497, 588)
+
+[node name="GravityPortal" parent="." unique_id=2100175573 instance=ExtResource("5_3h30w")]
+position = Vector2(2360, 595)
+
+[node name="GravityPortal2" parent="." unique_id=291153024 instance=ExtResource("5_3h30w")]
+position = Vector2(2451, 402)
+
+[node name="StackedBlocks" parent="." unique_id=2096799218 instance=ExtResource("4_shr66")]
+position = Vector2(2749, 580)
+
+[node name="StackedBlocks2" parent="." unique_id=690489307 instance=ExtResource("4_shr66")]
+position = Vector2(2800, 576)
+
+[node name="SpikeLow2" parent="." unique_id=31828628 instance=ExtResource("1_bo32x")]
+position = Vector2(2846, 589)
+
+[node name="SpikeLow3" parent="." unique_id=11059758 instance=ExtResource("1_bo32x")]
+position = Vector2(2887, 588)
+
+[node name="StackedBlocks3" parent="." unique_id=279220584 instance=ExtResource("4_shr66")]
+position = Vector2(2934, 571)
+
+[node name="BlockFloating" parent="." unique_id=31359840 instance=ExtResource("3_4t8up")]
+position = Vector2(2873, 214)
+
+[node name="SpikeCeiling" parent="." unique_id=1658926592 instance=ExtResource("2_kc6vv")]
+position = Vector2(2873, 284)
+
+[node name="StackedBlocks4" parent="." unique_id=970818216 instance=ExtResource("4_shr66")]
+position = Vector2(2982, 570)
+
+[node name="StackedBlocks5" parent="." unique_id=418809534 instance=ExtResource("4_shr66")]
+position = Vector2(3038, 568)
+
+[node name="StackedBlocks6" parent="." unique_id=328116965 instance=ExtResource("4_shr66")]
+position = Vector2(3134, 570)
+
+[node name="GravityPortal3" parent="." unique_id=546550034 instance=ExtResource("5_3h30w")]
+position = Vector2(3330, 584)
+
+[node name="StackedBlocks7" parent="." unique_id=1988739950 instance=ExtResource("4_shr66")]
+position = Vector2(3846, 572)
+
+[node name="AirPlatform3" parent="." unique_id=1864404581 instance=ExtResource("7_dobx7")]
+position = Vector2(3930, 604)
+
+[node name="AirPlatform4" parent="." unique_id=1061178176 instance=ExtResource("7_dobx7")]
+position = Vector2(4050, 604)
+
+[node name="StackedBlocks8" parent="." unique_id=117814458 instance=ExtResource("4_shr66")]
+position = Vector2(4134, 567)
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=487685279]
+show_behind_parent = true
+top_level = true
+light_mask = 513
+offset_left = 3871.0
+offset_top = 523.0
+offset_right = 4110.0
+offset_bottom = 592.0
+color = Color(0, 1, 1, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="GravityPortal4" parent="." unique_id=1077313501 instance=ExtResource("5_3h30w")]
+visible = false
+position = Vector2(2068, 312)
+
+[node name="AirPlatform5" parent="." unique_id=113132811 instance=ExtResource("7_dobx7")]
+position = Vector2(2224, 437)
+
+[node name="AirPlatform6" parent="." unique_id=761744645 instance=ExtResource("7_dobx7")]
+position = Vector2(2505, 158)
+
+[node name="StackedBlocks9" parent="." unique_id=81734304 instance=ExtResource("4_shr66")]
+position = Vector2(4372, 568)
+
+[node name="PlatformBlock" parent="." unique_id=1922147253 instance=ExtResource("6_qbgax")]
+position = Vector2(4318, 592)
+
+[node name="SpikeDouble" parent="." unique_id=1444801515 instance=ExtResource("14_4t8up")]
+position = Vector2(4427, 587)
+
+[node name="SpikeDouble2" parent="." unique_id=1293574066 instance=ExtResource("14_4t8up")]
+position = Vector2(4489, 586)
+
+[node name="SpikeDouble3" parent="." unique_id=937379396 instance=ExtResource("14_4t8up")]
+position = Vector2(4551, 586)
+
+[node name="AirPlatform7" parent="." unique_id=903384780 instance=ExtResource("7_dobx7")]
+visible = false
+position = Vector2(4519, 484)
+scale = Vector2(2, 1)
+
+[node name="StackedBlocks10" parent="." unique_id=1803560637 instance=ExtResource("4_shr66")]
+position = Vector2(4368, 472)
+
+[node name="StackedBlocks11" parent="." unique_id=1562143159 instance=ExtResource("4_shr66")]
+position = Vector2(4319, 519)
+
+[node name="StackedBlocks12" parent="." unique_id=1763790312 instance=ExtResource("4_shr66")]
+position = Vector2(4269, 565)
+
+[node name="BlockFloating2" parent="." unique_id=1060826054 instance=ExtResource("3_4t8up")]
+position = Vector2(4375, 299)
+
+[node name="PlatformBlock2" parent="." unique_id=1191826647 instance=ExtResource("6_qbgax")]
+position = Vector2(4220, 592)
+
+[node name="AirPlatform" parent="." unique_id=1110634859 instance=ExtResource("7_dobx7")]
+position = Vector2(3504, 117)
+
+[node name="GravityPortal5" parent="." unique_id=1527190923 instance=ExtResource("5_3h30w")]
+position = Vector2(3690, 157)
+scale = Vector2(2, 2)
+
+[node name="SpikeDouble4" parent="." unique_id=1318211825 instance=ExtResource("14_4t8up")]
+position = Vector2(3627, 578)
+
+[node name="AirPlatform2" parent="." unique_id=534670567 instance=ExtResource("7_dobx7")]
+position = Vector2(2289, 409)
+
+[node name="GravityPortal6" parent="." unique_id=1732538212 instance=ExtResource("5_3h30w")]
+position = Vector2(2594, 207)
+
+[node name="SpikeLow4" parent="." unique_id=77393769 instance=ExtResource("1_bo32x")]
+position = Vector2(3082, 589)
+
+[node name="GravityPortal7" parent="." unique_id=1656095730 instance=ExtResource("5_3h30w")]
+position = Vector2(4708, 574)
+
+[node name="GravityPortal8" parent="." unique_id=1020140605 instance=ExtResource("5_3h30w")]
+position = Vector2(4776, 382)
+
+[node name="AirPlatform8" parent="." unique_id=1921001052 instance=ExtResource("7_dobx7")]
+position = Vector2(4790, 326)
+
+[node name="FreeMoveZone" parent="." unique_id=1150383288 instance=ExtResource("14_shr66")]
+position = Vector2(5223, 280)
+
+[node name="StackedBlocks13" parent="." unique_id=1086565720 instance=ExtResource("4_shr66")]
+position = Vector2(5038, 570)
+
+[node name="StackedBlocks15" parent="." unique_id=242645638 instance=ExtResource("4_shr66")]
+position = Vector2(5189, 572)
+
+[node name="SpikeLow5" parent="." unique_id=930085077 instance=ExtResource("1_bo32x")]
+position = Vector2(5093, 590)
+
+[node name="SpikeLow6" parent="." unique_id=328270590 instance=ExtResource("1_bo32x")]
+position = Vector2(5146, 594)
+
+[node name="Icon" type="Sprite2D" parent="." unique_id=89080365]
+position = Vector2(6224, 435)
+texture = ExtResource("15_3h30w")
+
+[node name="FreeMoveZone2" parent="." unique_id=23216241 instance=ExtResource("14_shr66")]
+position = Vector2(6712, 522)
+scale = Vector2(0.1, 0.1)
+
+[node name="SpikeCeiling2" parent="." unique_id=705612644 instance=ExtResource("2_kc6vv")]
+position = Vector2(10276.001, -2621)
+scale = Vector2(1000, 50)
+
+[node name="StackedBlocks16" parent="." unique_id=814296524 instance=ExtResource("4_shr66")]
+position = Vector2(7367, 577)
+
+[node name="StackedBlocks17" parent="." unique_id=89622711 instance=ExtResource("4_shr66")]
+position = Vector2(7376, 385)
+
+[node name="AirPlatform9" parent="." unique_id=155546826 instance=ExtResource("7_dobx7")]
+position = Vector2(7500, 511)
+
+[node name="SpikeLow7" parent="." unique_id=1190138277 instance=ExtResource("1_bo32x")]
+position = Vector2(7540, 493)
+
+[node name="AirPlatform10" parent="." unique_id=1019141981 instance=ExtResource("7_dobx7")]
+position = Vector2(7699, 482)
+
+[node name="SpikeLow8" parent="." unique_id=164510979 instance=ExtResource("1_bo32x")]
+position = Vector2(7602, 587)
+
+[node name="AirPlatform11" parent="." unique_id=257066875 instance=ExtResource("7_dobx7")]
+position = Vector2(8124, 519)
+scale = Vector2(5, 1)
+
+[node name="PlatformBlock3" parent="." unique_id=1176258362 instance=ExtResource("6_qbgax")]
+position = Vector2(4989, 594)
+
+[node name="SpikeLow9" parent="." unique_id=2125909417 instance=ExtResource("1_bo32x")]
+position = Vector2(6713, 584)
+
+[node name="SpikeLow10" parent="." unique_id=1123725112 instance=ExtResource("1_bo32x")]
+position = Vector2(8068, 505)
+
+[node name="SpikeLow11" parent="." unique_id=2103840118 instance=ExtResource("1_bo32x")]
+position = Vector2(8306, 501)
+
+[node name="SpikeLow12" parent="." unique_id=2119434488 instance=ExtResource("1_bo32x")]
+position = Vector2(5761, 580)
+
+[node name="ColorZone" parent="." unique_id=444100001 instance=ExtResource("16_zone")]
+position = Vector2(4400, 640)

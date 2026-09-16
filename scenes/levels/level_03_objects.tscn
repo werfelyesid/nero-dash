@@ -1,0 +1,5 @@
+[gd_scene format=3 uid="uid://level_03_objects"]
+
+; 💀 NIVEL 03 - Arrastra obstáculos aquí desde scenes/obstacles/
+
+[node name="Level03Objects" type="Node2D"]

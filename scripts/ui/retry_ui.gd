@@ -35,10 +35,16 @@ func show_retry(attempts: int) -> void:
 
 ## Callback del botón de reintentar
 func _on_retry_pressed() -> void:
-	# Buscar el LevelManager en la escena
-	var level_manager := get_tree().get_first_node_in_group("level_manager") as LevelManager
-	if level_manager:
-		level_manager.restart_level()
+	# Buscar el LevelManager recorriendo el árbol
+	var lm: LevelManager = null
+	var parent := get_parent()
+	while parent:
+		lm = parent.get_node_or_null("LevelManager") as LevelManager
+		if lm:
+			break
+		parent = parent.get_parent()
+	
+	if lm:
+		lm.restart_level()
 	else:
-		# Fallback: recargar la escena
 		get_tree().reload_current_scene()

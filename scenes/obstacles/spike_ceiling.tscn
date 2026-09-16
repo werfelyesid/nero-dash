@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://spike_ceiling_001"]
+
+[ext_resource type="Script" path="res://scripts/obstacles/obstacle_base.gd" id="1_obstacle"]
+
+[sub_resource type="RectangleShape2D" id="ceiling_collision"]
+size = Vector2(44, 90)
+
+[node name="SpikeCeiling" type="Area2D"]
+position = Vector2(0, 45)
+script = ExtResource("1_obstacle")
+; Este obstáculo va pegado al techo (Y negativo)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("ceiling_collision")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, 0)
+scale = Vector2(1, -1)
+centered = true
+; ⚠️ Triángulo invertido (scale.y = -1) — pincho de techo
